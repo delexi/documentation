@@ -188,3 +188,26 @@ Supported groups are:
 /Does this even make sense?/
 
 /Is "a" just a helper and grouping a separate feature?/
+* EBNF
+#+BEGIN_EXAMPLE
+  property = "title" | "body" | "s" | "d" | "c" | "i" | "ic" | "tn" | "t" | "p" | "clocked" | "clocking" | "clockin" | "clockout"
+  operator = "eq" | "ne" | "lt" | "le" | "gt" | "ge"
+
+  equality-operator = "eq" | "ne"
+
+  condition = time-condition | state-condidition | tag-condition | priority-condition
+
+  priority-value = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
+  priority-condition = "p.", operator, priority-value
+
+  tag-value = ? a word containing any character except for "space" and ":" ?
+  tag-condition = "t." | "tn.", operator, tag-value
+
+  state-value = ? any string defined as either =TODO= or =DONE= state (depends on user settings) ?
+  state-condition = "i.", operator, ".", state-value
+                 ,| "i.", state-value
+
+  state-class-value = "todo" | "done" | "none" | "no"
+  state-class-condition = "ic.", equality-operator, state-class-value
+#+END_EXAMPLE
+
