@@ -188,26 +188,70 @@ Supported groups are:
 /Does this even make sense?/
 
 /Is "a" just a helper and grouping a separate feature?/
+
 * EBNF
 #+BEGIN_EXAMPLE
-  property = "title" | "body" | "s" | "d" | "c" | "i" | "ic" | "tn" | "t" | "p" | "clocked" | "clocking" | "clockin" | "clockout"
-  operator = "eq" | "ne" | "lt" | "le" | "gt" | "ge"
+  digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
+  number = digit, { digit };
+  none = "none" | "no";
 
-  equality-operator = "eq" | "ne"
+  equality-operator = "eq" | "ne";
+  operator = "eq" | "ne" | "lt" | "le" | "gt" | "ge";
 
-  condition = time-condition | state-condidition | tag-condition | priority-condition
+  condition = general-condition | priority-condition | state-condidition | tag-condition | time-condition
+            ,| composite-condition;
 
-  priority-value = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
-  priority-condition = "p.", operator, priority-value
+  general-value     = ? anything but a newline character ?;
+  general-property  = "title" | "body" | "clocked" | "clocking"
+                    ,| ? any non-whitespace character but cannot end with a plus sign. It cannot be the empty string. ?;
+  general-condition = general-property, ".", operator, general-value;
 
-  tag-value = ? a word containing any character except for "space" and ":" ?
-  tag-condition = "t." | "tn.", operator, tag-value
+  priority-value     = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z";
+  priority-condition = "p.", operator, priority-value;
 
-  state-value = ? any string defined as either =TODO= or =DONE= state (depends on user settings) ?
+  tag-value     = ? a word containing any character except for "space" and ":" ?;
+  tag-condition = "t." | "tn.", operator, tag-value;
+
+  time-property    = "s" | "d" | "c" | "clockin" | "clockout";
+  day              = 2 * digit;
+  month            = 2 * digit;
+  year             = 4 * digit;
+  date             = year, "-", month, "-", day;
+  date-time-stamp  = "now";
+  time-period-unit = "d" | "w" | "m" | "y"
+                   ,| "today" | "tod"
+                   ,| "tomorrow" | "tmrw" | "tom";
+  time-period      = [-], number, time-period-unit;
+  time-value       = time-period | date-time-stamp | date | none;
+  time-condition   = time-property, ".", operator, ".", time-value;
+
+  state-value     = ? any string defined as either =TODO= or =DONE= state (depends on user settings) ?;
   state-condition = "i.", operator, ".", state-value
-                 ,| "i.", state-value
+                  ,| "i.", state-value;
 
-  state-class-value = "todo" | "done" | "none" | "no"
-  state-class-condition = "ic.", equality-operator, state-class-value
+  state-class-value     = "todo" | "done" | none;
+  state-class-condition = "ic.", equality-operator, state-class-value;
+
+
+  whitespace = " ", {" "};
+
+  binary-logical-operator = "and" | "or";
+  composite-condidition   = condition, whitespace, binary-logical-operator, whitespace, condition
+                          ,| condition, whitespace, condition
+                          ,| "-", condition
+                          ,| "not", whitespace, condition;
+
+  condition-with-parens = "(", whitespace, condition, whitespace, ")";
+
+
+  orderby-property    = "b" | "book" | "notebook"
+                      ,| "s" | "sched" | "scheduled"
+                      ,| "d" | "dead" | "deadline"
+                      ,| "p" | "pri" | "prio" | "priority";
+  ordering            = "o.", orderby-property;
+  ordering-expression = ordering, {ordering};
+
+
+  search = condition, [ordering-expression]
 #+END_EXAMPLE
 
